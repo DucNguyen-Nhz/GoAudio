@@ -3,6 +3,7 @@ package socket
 import (
 	"fmt"
 	"io"
+	"net"
 
 	"golang.org/x/net/websocket"
 )
@@ -41,16 +42,27 @@ func (s *Server) ReadLoop(ws *websocket.Conn) {
 			continue
 		}
 		msg := buf[:n]
-		s.Broadcast(msg)
+		fmt.Println("Received from "+ws.Request().RemoteAddr+": ", string(msg))
+		go s.Broadcast(msg)
 	}
 }
 
 func (s *Server) Broadcast(b []byte) {
 	for ws := range s.Conns {
-		go func(ws *websocket.Conn) {
-			if _, err := ws.Write(b); err != nil {
-				fmt.Println("Write error: ", err)
+		if _, err := ws.Write(b); err != nil {
+			if err == io.EOF {
+				delete(s.Conns, ws)
+				continue
 			}
-		}(ws)
+
+			if _, ok := err.(*net.OpError); ok {
+				delete(s.Conns, ws)
+				fmt.Println("Connection closed by client:", ws.RemoteAddr())
+				continue
+			}
+
+			fmt.Println("Write error: ", err)
+		}
+
 	}
 }
