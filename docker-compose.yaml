@@ -8,6 +8,8 @@ services:
     restart: unless-stopped
     networks:
       - chat-srv
+    environment:
+      NODE: 3000
   # cli:
   #   build: 
   #     context: .
