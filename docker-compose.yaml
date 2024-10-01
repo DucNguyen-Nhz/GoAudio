@@ -1,0 +1,19 @@
+services:
+  srv:
+    build: 
+      context: .
+      dockerfile: ./docker/socket/Dockerfile.srv
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - chat-srv
+  # cli:
+  #   build: 
+  #     context: .
+  #     dockerfile: ./docker/socket/Dockerfile.cli
+  #   restart: unless-stopped
+  #   networks:
+  #     - chat-srv
+networks:
+  chat-srv:

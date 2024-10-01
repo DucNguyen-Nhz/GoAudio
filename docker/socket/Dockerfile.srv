@@ -1,0 +1,8 @@
+# syntax=docker/dockerfile:1
+FROM golang:latest
+WORKDIR /socket/srv
+COPY ./ /socket/srv/
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/SocketSrv
+EXPOSE 3000
+CMD ["./SocketSrv"]
