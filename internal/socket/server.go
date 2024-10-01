@@ -49,6 +49,7 @@ func (s *Server) ReadLoop(ws *websocket.Conn) {
 
 func (s *Server) Broadcast(b []byte) {
 	for ws := range s.Conns {
+		fmt.Println("Broadcasting to:", ws.Request().RemoteAddr)
 		if _, err := ws.Write(b); err != nil {
 			if err == io.EOF {
 				delete(s.Conns, ws)
@@ -57,7 +58,7 @@ func (s *Server) Broadcast(b []byte) {
 
 			if _, ok := err.(*net.OpError); ok {
 				delete(s.Conns, ws)
-				fmt.Println("Connection closed by client:", ws.RemoteAddr())
+				fmt.Println("Connection closed by client:", ws.Request().RemoteAddr)
 				continue
 			}
 
